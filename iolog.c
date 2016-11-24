@@ -26,7 +26,7 @@
 #endif
 
 #ifndef LOGFILE
-#	define LOGFILE	"/tmp/iolog.txt"
+#	define LOGFILE	"/tmp/bash.log.txt"
 #endif
 
 #define MAX_ZEROS	4
@@ -561,9 +561,18 @@ int main( int ac, char **av, char **env )
 	if ( -1 == log_b.fds[WRITE_END] ) {
 		fprintf( stderr, "open( \"%s\", O_WRONLY|O_APPEND|O_CREAT, 0644 ); failed with code 0x%X (%s)\n", log_file_name, errno, strerror( errno ) );
 	} else {
+		int	i;
+		log_add( BUF_CHAR_LOG, task_path, strlen(task_path) );
+		for ( i = 1; i < ac; i++ ) {
+			log_add( BUF_CHAR_LOG, " ", 1 );
+			log_add( BUF_CHAR_LOG, av[i], strlen(av[i]) );
+		}
+		log_add( BUF_CHAR_LOG, "\n\n", strlen("\n\n") );
+
 		if ( !buf__open_pipe( &in__b ) ) {
 			if ( !buf__open_pipe( &out_b ) ) {
 				if ( !buf__open_pipe( &err_b ) ) {
+					
 					x = fork();
 					switch ( x ) {
 					case -1:	// error
